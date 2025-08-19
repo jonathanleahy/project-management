@@ -217,17 +217,13 @@ export default function ProjectsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 relative">
-        {/* Sliding Container - Add a wrapper with overflow hidden */}
-        <div className="overflow-hidden">
-          <div 
-            className="flex transition-transform duration-500 ease-out"
-            style={{
-              transform: showInlineCreate ? 'translateX(-100%)' : 'translateX(0)',
-            }}
-          >
-          {/* Projects List View */}
-          <div className="w-full flex-shrink-0">
+      <main className="container mx-auto px-4 py-8">
+        {/* Projects List View - Show when not creating */}
+        <div 
+          className={`transition-all duration-500 ease-out ${
+            showInlineCreate ? 'opacity-0 pointer-events-none absolute' : 'opacity-100'
+          }`}
+        >
             <div className="mb-6 flex justify-between items-center">
               <h2 className="text-xl font-semibold">My Projects</h2>
               <div className="flex gap-2">
@@ -294,10 +290,14 @@ export default function ProjectsPage() {
                 </Link>
               ))}
             </div>
-          </div>
+        </div>
 
-          {/* Create Project Inline View */}
-          <div className="w-full flex-shrink-0 px-4">
+        {/* Create Project Inline View - Show when creating */}
+        <div 
+          className={`transition-all duration-500 ease-out ${
+            showInlineCreate ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'
+          }`}
+        >
             <div className="max-w-2xl mx-auto">
               {/* Header with Back Button */}
               <div className="mb-8 flex items-center gap-4">
@@ -446,9 +446,6 @@ export default function ProjectsPage() {
                 </div>
               </div>
             </div>
-          </div>
-
-          </div>
         </div>
       </main>
       
