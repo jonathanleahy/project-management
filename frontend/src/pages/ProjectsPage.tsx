@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/hooks/useAuth'
 import { Link } from 'react-router-dom'
 import { formatDate } from '@/lib/utils'
 import { SlidePanel } from '@/components/SlidePanel'
+import { ProjectCreationWizard } from '@/components/ProjectCreationWizard'
+import { LayoutWithSidebar } from '@/components/LayoutWithSidebar'
 import { gql, useMutation } from '@apollo/client'
 import { useToast } from '@/components/ui/use-toast'
 
@@ -60,7 +61,6 @@ const CREATE_PROJECT = gql`
 `
 
 export default function ProjectsPage() {
-  const { user, logout } = useAuth()
   const { toast } = useToast()
   const [showCreatePanel, setShowCreatePanel] = useState(false)
   const [showInlineCreate, setShowInlineCreate] = useState(false)
@@ -154,8 +154,8 @@ export default function ProjectsPage() {
     setIsCreating(false)
   }
   
-  const handleCreateProjectInline = async () => {
-    if (!newProjectName.trim()) {
+  const handleCreateProjectInline = async (projectData: any) => {
+    if (!projectData.name.trim()) {
       toast({
         title: "Error",
         description: "Project name is required",
@@ -173,20 +173,20 @@ export default function ProjectsPage() {
     try {
       await createProject({
         variables: {
-          name: newProjectName,
-          description: newProjectDescription || null
+          name: projectData.name,
+          description: projectData.description || null
         }
       })
     } catch (error) {
       // Fallback to mock data if GraphQL fails
       const newProject = {
         id: `proj${projects.length + 1}`,
-        name: newProjectName,
-        description: newProjectDescription || 'No description',
+        name: projectData.name,
+        description: projectData.description || 'No description',
         createdAt: new Date(),
-        owner: { id: '1', name: user?.name || 'User' },
+        owner: { id: '1', name: 'User' },
         members: [
-          { id: `${projects.length + 1}`, user: { id: '1', name: user?.name || 'User' }, role: 'OWNER' },
+          { id: `${projects.length + 1}`, user: { id: '1', name: 'User' }, role: 'OWNER' },
         ],
         stats: {
           totalTasks: 0,
@@ -200,46 +200,37 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Project Management</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              Welcome, {user?.name}
-            </span>
-            <Button variant="outline" size="sm" onClick={() => logout()}>
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Projects List View - Show when not creating */}
-        <div 
-          className={`transition-all duration-500 ease-out ${
-            showInlineCreate ? 'opacity-0 pointer-events-none absolute' : 'opacity-100'
-          }`}
-        >
-            <div className="mb-6 flex justify-between items-center">
-              <h2 className="text-xl font-semibold">My Projects</h2>
-              <div className="flex gap-2">
-                <Button 
-                  onClick={() => setShowInlineCreate(true)}
-                  variant="outline"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Project (Slide)
-                </Button>
-                <Button onClick={() => setShowCreatePanel(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Project (Panel)
-                </Button>
+    <LayoutWithSidebar>
+      {/* Main Content with sliding animation */}
+      <main className="relative overflow-hidden">
+        <div className="container mx-auto px-4 py-8">
+          {/* Sliding Container */}
+          <div 
+            className="flex transition-transform duration-500 ease-out"
+            style={{
+              transform: showInlineCreate ? 'translateX(-100%)' : 'translateX(0)',
+            }}
+          >
+            {/* Projects List View */}
+            <div className="w-full flex-shrink-0">
+              <div className="mb-6 flex justify-between items-center">
+                <h2 className="text-xl font-semibold">My Projects</h2>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => setShowInlineCreate(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Project
+                  </Button>
+                  <Button 
+                    onClick={() => setShowCreatePanel(true)}
+                    variant="outline"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Quick Create
+                  </Button>
+                </div>
               </div>
-            </div>
 
             {/* Projects section now starts immediately */}
 
@@ -290,162 +281,17 @@ export default function ProjectsPage() {
                 </Link>
               ))}
             </div>
-        </div>
-
-        {/* Create Project Inline View - Show when creating */}
-        <div 
-          className={`transition-all duration-500 ease-out ${
-            showInlineCreate ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'
-          }`}
-        >
-            <div className="max-w-2xl mx-auto">
-              {/* Header with Back Button */}
-              <div className="mb-8 flex items-center gap-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleCloseInline}
-                  className="hover:bg-muted"
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <h2 className="text-2xl font-bold">Create New Project</h2>
-              </div>
-
-              {/* Content */}
-              <div className="space-y-8">
-                {/* Hero Section */}
-                <div className="text-center py-8 space-y-4">
-                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                    <Sparkles className="h-10 w-10 text-primary" />
-                  </div>
-                  <h3 className="text-3xl font-bold">Let's bring your ideas to life</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Create a space for your team to collaborate, track progress, and achieve goals together.
-                  </p>
-                </div>
-
-                {/* Form Card */}
-                <Card className="p-8">
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Label htmlFor="inline-project-name" className="text-lg font-semibold">
-                        What should we call your project?
-                      </Label>
-                      <Input
-                        id="inline-project-name"
-                        placeholder="e.g., Product Launch 2024, Website Redesign"
-                        value={newProjectName}
-                        onChange={(e) => setNewProjectName(e.target.value)}
-                        className="h-14 text-lg"
-                        autoFocus
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Don't worry, you can always change this later.
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label htmlFor="inline-project-description" className="text-lg font-semibold">
-                        Tell us more about it
-                      </Label>
-                      <Textarea
-                        id="inline-project-description"
-                        placeholder="Describe your project goals, timeline, or any important details..."
-                        value={newProjectDescription}
-                        onChange={(e) => setNewProjectDescription(e.target.value)}
-                        className="min-h-[150px] text-base resize-none"
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        A good description helps your team understand the project's purpose.
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Quick Setup Options */}
-                <Card className="p-6 bg-muted/30">
-                  <h4 className="font-semibold mb-4">Quick Setup Options</h4>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                        <Users className="h-4 w-4 text-blue-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Team Collaboration</p>
-                        <p className="text-xs text-muted-foreground">
-                          Invite team members right after creation
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Task Templates</p>
-                        <p className="text-xs text-muted-foreground">
-                          Start with pre-built task structures
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="h-4 w-4 text-purple-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Timeline Planning</p>
-                        <p className="text-xs text-muted-foreground">
-                          Set milestones and deadlines
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                        <Sparkles className="h-4 w-4 text-orange-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">AI Assistance</p>
-                        <p className="text-xs text-muted-foreground">
-                          Get smart suggestions for tasks
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Action Buttons */}
-                <div className="flex gap-4 pb-8">
-                  <Button
-                    size="lg"
-                    className="flex-1 h-14 text-base"
-                    onClick={handleCreateProjectInline}
-                    disabled={isCreating || !newProjectName.trim()}
-                  >
-                    {isCreating ? (
-                      <span className="flex items-center gap-2">
-                        <span className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Creating your project...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        Create Project
-                        <ArrowRight className="h-5 w-5" />
-                      </span>
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-14 text-base"
-                    onClick={handleCloseInline}
-                    disabled={isCreating}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
             </div>
+
+            {/* Create Project Wizard View */}
+            <div className="w-full flex-shrink-0">
+              <ProjectCreationWizard 
+                onClose={handleCloseInline}
+                onCreate={handleCreateProjectInline}
+                isCreating={isCreating}
+              />
+            </div>
+          </div>
         </div>
       </main>
       
@@ -563,6 +409,6 @@ export default function ProjectsPage() {
           </div>
         </div>
       </SlidePanel>
-    </div>
+    </LayoutWithSidebar>
   )
 }

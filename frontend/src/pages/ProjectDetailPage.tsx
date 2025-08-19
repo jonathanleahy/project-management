@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
 import TaskTable from '@/components/TaskTable'
+import { LayoutWithSidebar } from '@/components/LayoutWithSidebar'
 
 // Mock data for demo
 const mockProjects: any = {
@@ -87,9 +88,9 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
+    <LayoutWithSidebar>
+      {/* Project Header */}
+      <div className="border-b bg-card">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4">
             <Link to="/projects">
@@ -112,7 +113,7 @@ export default function ProjectDetailPage() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Tabs */}
       <div className="container mx-auto px-4 py-6">
@@ -199,6 +200,6 @@ export default function ProjectDetailPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </LayoutWithSidebar>
   )
 }
