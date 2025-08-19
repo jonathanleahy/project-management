@@ -281,14 +281,16 @@ export default function ProjectsPage() {
             </div>
           </main>
 
-          {/* Create Project Wizard View */}
-          <div className="w-full flex-shrink-0">
-            <ProjectCreationWizard 
-              onClose={handleCloseInline}
-              onCreate={handleCreateProjectInline}
-              isCreating={isCreating}
-            />
-          </div>
+          {/* Create Project Wizard View - Only render when needed */}
+          {showInlineCreate && (
+            <div className="w-full flex-shrink-0">
+              <ProjectCreationWizard 
+                onClose={handleCloseInline}
+                onCreate={handleCreateProjectInline}
+                isCreating={isCreating}
+              />
+            </div>
+          )}
         </div>
       </div>
       

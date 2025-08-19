@@ -116,8 +116,17 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [showQuickAccess, setShowQuickAccess] = useState(true)
+  
+  // Load sidebar state from localStorage
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed')
+    return saved === 'true'
+  })
+  
+  const [showQuickAccess, setShowQuickAccess] = useState(() => {
+    const saved = localStorage.getItem('sidebarQuickAccess')
+    return saved !== 'false' // Default to true if not set
+  })
   
   const handleLogout = () => {
     logout()
@@ -126,6 +135,18 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/')
+  }
+  
+  const toggleSidebar = () => {
+    const newState = !isCollapsed
+    setIsCollapsed(newState)
+    localStorage.setItem('sidebarCollapsed', String(newState))
+  }
+  
+  const toggleQuickAccess = () => {
+    const newState = !showQuickAccess
+    setShowQuickAccess(newState)
+    localStorage.setItem('sidebarQuickAccess', String(newState))
   }
   
   return (
@@ -150,7 +171,7 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={toggleSidebar}
             className="ml-auto"
           >
             {isCollapsed ? (
@@ -218,7 +239,7 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
             <>
               <div className="pt-4 pb-2">
                 <button
-                  onClick={() => setShowQuickAccess(!showQuickAccess)}
+                  onClick={toggleQuickAccess}
                   className="w-full flex items-center justify-between px-3 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
                 >
                   QUICK ACCESS
