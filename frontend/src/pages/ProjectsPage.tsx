@@ -203,15 +203,13 @@ export default function ProjectsPage() {
     <LayoutWithSidebar>
       {/* Main Content with sliding animation */}
       <div className="relative overflow-hidden h-full">
-        <div 
-          className="flex transition-transform duration-500 ease-out h-full"
-          style={{
-            transform: showInlineCreate ? 'translateX(-100%)' : 'translateX(0)',
-          }}
+        {/* Projects List View */}
+        <main 
+          className={`absolute inset-0 px-4 py-8 transition-transform duration-500 ease-out ${
+            showInlineCreate ? '-translate-x-full' : 'translate-x-0'
+          }`}
         >
-          {/* Projects List View */}
-          <main className="w-full flex-shrink-0 px-4 py-8">
-            <div className="container mx-auto">
+          <div className="container mx-auto">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold">My Projects</h2>
                 <div className="flex gap-2">
@@ -278,19 +276,20 @@ export default function ProjectsPage() {
                 </Link>
                 ))}
               </div>
-            </div>
-          </main>
+          </div>
+        </main>
 
-          {/* Create Project Wizard View - Only render when needed */}
-          {showInlineCreate && (
-            <div className="w-full flex-shrink-0">
-              <ProjectCreationWizard 
-                onClose={handleCloseInline}
-                onCreate={handleCreateProjectInline}
-                isCreating={isCreating}
-              />
-            </div>
-          )}
+        {/* Create Project Wizard View */}
+        <div 
+          className={`absolute inset-0 transition-transform duration-500 ease-out ${
+            showInlineCreate ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <ProjectCreationWizard 
+            onClose={handleCloseInline}
+            onCreate={handleCreateProjectInline}
+            isCreating={isCreating}
+          />
         </div>
       </div>
       
