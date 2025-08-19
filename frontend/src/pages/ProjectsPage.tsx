@@ -203,16 +203,16 @@ export default function ProjectsPage() {
   return (
     <LayoutWithSidebar>
       {/* Main Content with sliding animation */}
-      <div className="relative overflow-hidden" style={{ height: 'calc(100vh - 3.5rem)' }}>
+      <div className="relative h-full overflow-hidden">
         <div 
-          className="absolute inset-0 flex transition-transform duration-500 ease-out"
+          className="flex h-full transition-transform duration-500 ease-out"
           style={{
             width: '200%',
             transform: showInlineCreate ? 'translateX(-50%)' : 'translateX(0%)'
           }}
         >
           {/* Projects List View */}
-          <main className="w-1/2 px-4 py-8 overflow-auto">
+          <main className="w-1/2 px-4 py-8 h-full overflow-auto">
             <div className="container mx-auto">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold">My Projects</h2>
@@ -284,7 +284,7 @@ export default function ProjectsPage() {
           </main>
 
           {/* Create Project Wizard View */}
-          <div className="w-1/2 overflow-auto">
+          <div className="w-1/2 h-full overflow-auto">
             {showInlineCreate ? (
               <ProjectCreationWizard 
                 onClose={handleCloseInline}
