@@ -150,11 +150,11 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
   }
   
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="h-screen bg-background flex overflow-hidden">
       {/* Sidebar */}
       <aside 
         className={cn(
-          "bg-card border-r flex flex-col transition-all duration-300 flex-shrink-0",
+          "bg-card border-r flex flex-col transition-all duration-300 flex-shrink-0 h-full overflow-hidden",
           isCollapsed ? "w-16" : "w-64"
         )}
       >
@@ -321,9 +321,9 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col transition-all duration-300">
+      <div className="flex-1 flex flex-col transition-all duration-300 h-full overflow-hidden">
         {/* Header */}
-        <header className="border-b bg-background h-14 flex items-center px-6">
+        <header className="border-b bg-background h-14 flex items-center px-6 flex-shrink-0">
           <div className="flex-1">
             {/* Breadcrumbs or page title can go here */}
           </div>

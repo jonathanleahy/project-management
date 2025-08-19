@@ -10,6 +10,7 @@ import { formatDate } from '@/lib/utils'
 import { SlidePanel } from '@/components/SlidePanel'
 import { ProjectCreationWizard } from '@/components/ProjectCreationWizard'
 import { LayoutWithSidebar } from '@/components/LayoutWithSidebar'
+import { AnimatedPageTransition } from '@/components/AnimatedPageTransition'
 import { gql, useMutation } from '@apollo/client'
 import { useToast } from '@/components/ui/use-toast'
 
@@ -201,17 +202,14 @@ export default function ProjectsPage() {
 
   return (
     <LayoutWithSidebar>
-      {/* Main Content with sliding animation */}
-      <div className="overflow-hidden">
-        <div 
-          className="flex transition-transform duration-500 ease-out"
-          style={{
-            transform: showInlineCreate ? 'translateX(-100%)' : 'translateX(0)',
-            width: '200%'
-          }}
+      {/* Main Content with animated transitions */}
+      <div className="relative h-full overflow-hidden">
+        {/* Projects List View - slides out to the left */}
+        <AnimatedPageTransition 
+          isActive={!showInlineCreate}
+          direction="left"
         >
-          {/* Projects List View */}
-          <main className="w-1/2 px-4 py-8">
+          <main className="px-4 py-8">
             <div className="container mx-auto">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold">My Projects</h2>
@@ -279,18 +277,21 @@ export default function ProjectsPage() {
                 </Link>
                 ))}
               </div>
-          </div>
-        </main>
+            </div>
+          </main>
+        </AnimatedPageTransition>
 
         {/* Create Project Wizard View */}
-        <div className="w-1/2">
+        <AnimatedPageTransition 
+          isActive={showInlineCreate}
+          direction="right"
+        >
           <ProjectCreationWizard 
             onClose={handleCloseInline}
             onCreate={handleCreateProjectInline}
             isCreating={isCreating}
           />
-        </div>
-      </div>
+        </AnimatedPageTransition>
       </div>
       
       {/* Create Project Slide Panel */}
