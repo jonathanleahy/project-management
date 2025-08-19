@@ -284,6 +284,7 @@ export default function ProjectsPage() {
                 </Link>
               ))}
             </div>
+            </div>
 
             {/* Create Project Wizard View */}
             <div 
