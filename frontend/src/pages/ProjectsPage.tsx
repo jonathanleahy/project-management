@@ -205,8 +205,10 @@ export default function ProjectsPage() {
       <div className="relative overflow-hidden h-full">
         {/* Projects List View */}
         <main 
-          className={`absolute inset-0 px-4 py-8 transition-transform duration-500 ease-out ${
-            showInlineCreate ? '-translate-x-full' : 'translate-x-0'
+          className={`absolute inset-0 px-4 py-8 transition-all duration-500 ease-out ${
+            showInlineCreate 
+              ? '-translate-x-full opacity-0 pointer-events-none' 
+              : 'translate-x-0 opacity-100'
           }`}
         >
           <div className="container mx-auto">
@@ -281,8 +283,10 @@ export default function ProjectsPage() {
 
         {/* Create Project Wizard View */}
         <div 
-          className={`absolute inset-0 transition-transform duration-500 ease-out ${
-            showInlineCreate ? 'translate-x-0' : 'translate-x-full'
+          className={`absolute inset-0 transition-all duration-500 ease-out ${
+            showInlineCreate 
+              ? 'translate-x-0 opacity-100' 
+              : 'translate-x-full opacity-0 pointer-events-none'
           }`}
         >
           <ProjectCreationWizard 
