@@ -201,44 +201,31 @@ export default function ProjectsPage() {
 
   return (
     <LayoutWithSidebar>
-      {/* Main Content with sliding animation */}
-      <main className="relative overflow-hidden h-full">
-        <div className="container mx-auto px-4 py-8 h-full">
-          {/* Sliding Container */}
-          <div 
-            className="relative w-full h-full"
-          >
-            {/* Projects List View */}
-            <div 
-              className={`w-full transition-all duration-500 ease-out ${
-                showInlineCreate 
-                  ? 'transform -translate-x-full opacity-0 pointer-events-none absolute' 
-                  : 'transform translate-x-0 opacity-100'
-              }`}
-            >
-              <div className="mb-6 flex justify-between items-center">
-                <h2 className="text-xl font-semibold">My Projects</h2>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => setShowInlineCreate(true)}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Project
-                  </Button>
-                  <Button 
-                    onClick={() => setShowCreatePanel(true)}
-                    variant="outline"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Quick Create
-                  </Button>
-                </div>
-              </div>
+      {/* Main Content */}
+      {!showInlineCreate ? (
+        /* Projects List View */
+        <main className="container mx-auto px-4 py-8">
+          <div className="mb-6 flex justify-between items-center">
+            <h2 className="text-xl font-semibold">My Projects</h2>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowInlineCreate(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New Project
+              </Button>
+              <Button 
+                onClick={() => setShowCreatePanel(true)}
+                variant="outline"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Quick Create
+              </Button>
+            </div>
+          </div>
 
-            {/* Projects section now starts immediately */}
-
-            {/* Projects Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Projects Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.map((project) => (
                 <Link key={project.id} to={`/projects/${project.id}`}>
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
@@ -282,27 +269,19 @@ export default function ProjectsPage() {
                     </CardContent>
                   </Card>
                 </Link>
-              ))}
-            </div>
-            </div>
-
-            {/* Create Project Wizard View */}
-            <div 
-              className={`w-full absolute top-0 left-0 transition-all duration-500 ease-out ${
-                showInlineCreate 
-                  ? 'transform translate-x-0 opacity-100' 
-                  : 'transform translate-x-full opacity-0 pointer-events-none'
-              }`}
-            >
-              <ProjectCreationWizard 
-                onClose={handleCloseInline}
-                onCreate={handleCreateProjectInline}
-                isCreating={isCreating}
-              />
-            </div>
+            ))}
           </div>
-        </div>
-      </main>
+        </main>
+      ) : (
+        /* Create Project Wizard View */
+        <main className="w-full">
+          <ProjectCreationWizard 
+            onClose={handleCloseInline}
+            onCreate={handleCreateProjectInline}
+            isCreating={isCreating}
+          />
+        </main>
+      )}
       
       {/* Create Project Slide Panel */}
       <SlidePanel
