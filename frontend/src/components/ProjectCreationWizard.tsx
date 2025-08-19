@@ -97,8 +97,8 @@ export function ProjectCreationWizard({ onClose, onCreate, isCreating }: Project
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
-      <div className="w-full max-w-4xl">
+    <div className="min-h-screen p-8">
+      <div className="w-full max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Button
