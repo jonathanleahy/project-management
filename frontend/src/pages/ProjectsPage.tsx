@@ -202,11 +202,18 @@ export default function ProjectsPage() {
 
   return (
     <LayoutWithSidebar>
-      {/* Main Content */}
-      {!showInlineCreate ? (
-        /* Projects List View */
-        <main className="px-4 py-8 overflow-auto">
-          <div className="container mx-auto">
+      {/* Main Content with sliding animation */}
+      <div className="relative overflow-hidden" style={{ height: 'calc(100vh - 3.5rem)' }}>
+        <div 
+          className="absolute inset-0 flex transition-transform duration-500 ease-out"
+          style={{
+            width: '200%',
+            transform: showInlineCreate ? 'translateX(-50%)' : 'translateX(0%)'
+          }}
+        >
+          {/* Projects List View */}
+          <main className="w-1/2 px-4 py-8 overflow-auto">
+            <div className="container mx-auto">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold">My Projects</h2>
                 <div className="flex gap-2">
@@ -272,19 +279,20 @@ export default function ProjectsPage() {
                   </Card>
                 </Link>
                 ))}
+              </div>
             </div>
+          </main>
+
+          {/* Create Project Wizard View */}
+          <div className="w-1/2 overflow-auto">
+            <ProjectCreationWizard 
+              onClose={handleCloseInline}
+              onCreate={handleCreateProjectInline}
+              isCreating={isCreating}
+            />
           </div>
-        </main>
-      ) : (
-        /* Create Project Wizard View */
-        <div className="overflow-auto">
-          <ProjectCreationWizard 
-            onClose={handleCloseInline}
-            onCreate={handleCreateProjectInline}
-            isCreating={isCreating}
-          />
         </div>
-      )}
+      </div>
       
       {/* Create Project Slide Panel */}
       <SlidePanel
