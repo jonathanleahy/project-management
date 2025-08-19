@@ -285,11 +285,13 @@ export default function ProjectsPage() {
 
           {/* Create Project Wizard View */}
           <div className="w-1/2 overflow-auto">
-            <ProjectCreationWizard 
-              onClose={handleCloseInline}
-              onCreate={handleCreateProjectInline}
-              isCreating={isCreating}
-            />
+            {showInlineCreate ? (
+              <ProjectCreationWizard 
+                onClose={handleCloseInline}
+                onCreate={handleCreateProjectInline}
+                isCreating={isCreating}
+              />
+            ) : null}
           </div>
         </div>
       </div>
