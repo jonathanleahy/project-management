@@ -133,7 +133,7 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
       {/* Sidebar */}
       <aside 
         className={cn(
-          "bg-card border-r flex flex-col transition-all duration-300 relative",
+          "bg-card border-r flex flex-col transition-all duration-300 flex-shrink-0",
           isCollapsed ? "w-16" : "w-64"
         )}
       >
@@ -300,7 +300,7 @@ export function LayoutWithSidebar({ children }: LayoutWithSidebarProps) {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col transition-all duration-300">
         {/* Header */}
         <header className="border-b bg-background h-14 flex items-center px-6">
           <div className="flex-1">
