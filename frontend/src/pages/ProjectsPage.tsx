@@ -202,19 +202,11 @@ export default function ProjectsPage() {
 
   return (
     <LayoutWithSidebar>
-      {/* Main Content with animated transitions */}
-      <div className="relative overflow-hidden min-h-screen">
-        {/* Sliding container with both views */}
-        <div 
-          className="flex min-h-screen transition-transform duration-500 ease-in-out"
-          style={{
-            width: '200%',
-            transform: showInlineCreate ? 'translateX(-50%)' : 'translateX(0)'
-          }}
-        >
-          {/* Projects List View */}
-          <main className="w-1/2 px-4 py-8 min-h-screen overflow-auto bg-background">
-            <div className="container mx-auto">
+      {/* Main Content */}
+      {!showInlineCreate ? (
+        /* Projects List View */
+        <main className="px-4 py-8 overflow-auto">
+          <div className="container mx-auto">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold">My Projects</h2>
                 <div className="flex gap-2">
@@ -280,22 +272,19 @@ export default function ProjectsPage() {
                   </Card>
                 </Link>
                 ))}
-              </div>
             </div>
-          </main>
-
-          {/* Create Project Wizard View - Only render content when active */}
-          <div className="w-1/2 min-h-screen overflow-auto">
-            {showInlineCreate && (
-              <ProjectCreationWizard 
-                onClose={handleCloseInline}
-                onCreate={handleCreateProjectInline}
-                isCreating={isCreating}
-              />
-            )}
           </div>
+        </main>
+      ) : (
+        /* Create Project Wizard View */
+        <div className="overflow-auto">
+          <ProjectCreationWizard 
+            onClose={handleCloseInline}
+            onCreate={handleCreateProjectInline}
+            isCreating={isCreating}
+          />
         </div>
-      </div>
+      )}
       
       {/* Create Project Slide Panel */}
       <SlidePanel
