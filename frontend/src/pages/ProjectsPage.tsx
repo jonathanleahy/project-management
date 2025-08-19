@@ -204,12 +204,16 @@ export default function ProjectsPage() {
     <LayoutWithSidebar>
       {/* Main Content with animated transitions */}
       <div className="relative h-full overflow-hidden">
-        {/* Projects List View - slides out to the left */}
-        <AnimatedPageTransition 
-          isActive={!showInlineCreate}
-          direction="left"
+        {/* Sliding container with both views */}
+        <div 
+          className="flex h-full transition-transform duration-500 ease-in-out"
+          style={{
+            width: '200%',
+            transform: showInlineCreate ? 'translateX(-50%)' : 'translateX(0)'
+          }}
         >
-          <main className="px-4 py-8">
+          {/* Projects List View */}
+          <main className="w-1/2 px-4 py-8 h-full overflow-auto">
             <div className="container mx-auto">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold">My Projects</h2>
@@ -279,19 +283,16 @@ export default function ProjectsPage() {
               </div>
             </div>
           </main>
-        </AnimatedPageTransition>
 
-        {/* Create Project Wizard View */}
-        <AnimatedPageTransition 
-          isActive={showInlineCreate}
-          direction="right"
-        >
-          <ProjectCreationWizard 
-            onClose={handleCloseInline}
-            onCreate={handleCreateProjectInline}
-            isCreating={isCreating}
-          />
-        </AnimatedPageTransition>
+          {/* Create Project Wizard View */}
+          <div className="w-1/2 h-full overflow-auto">
+            <ProjectCreationWizard 
+              onClose={handleCloseInline}
+              onCreate={handleCreateProjectInline}
+              isCreating={isCreating}
+            />
+          </div>
+        </div>
       </div>
       
       {/* Create Project Slide Panel */}

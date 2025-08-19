@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 interface AnimatedPageTransitionProps {
@@ -14,45 +14,33 @@ export function AnimatedPageTransition({
   direction = 'right',
   className 
 }: AnimatedPageTransitionProps) {
-  const [shouldRender, setShouldRender] = useState(false)
-
-  useEffect(() => {
+  // For projects list (direction='left'): 
+  //   - When active: translate-x-0
+  //   - When inactive: -translate-x-full (slides out to left)
+  // For wizard (direction='right'):
+  //   - When active: translate-x-0  
+  //   - When inactive: translate-x-full (stays off to right)
+  
+  const getTransformClass = () => {
     if (isActive) {
-      setShouldRender(true)
+      return 'translate-x-0 opacity-100'
     } else {
-      // Wait for animation to complete before unmounting
-      const timer = setTimeout(() => {
-        setShouldRender(false)
-      }, 500)
-      return () => clearTimeout(timer)
-    }
-  }, [isActive])
-
-  if (!shouldRender) return null
-
-  // Determine the transform based on active state and direction
-  const getTransform = () => {
-    if (isActive) {
-      return 'translateX(0%)'  // Slide to center
-    } else {
-      // Slide out based on direction
-      return direction === 'left' ? 'translateX(-100%)' : 'translateX(100%)'
+      if (direction === 'left') {
+        return '-translate-x-full opacity-0'
+      } else {
+        return 'translate-x-full opacity-0'
+      }
     }
   }
-
-  // Initial position based on direction
-  const initialTransform = direction === 'left' ? 'translateX(-100%)' : 'translateX(100%)'
 
   return (
     <div 
       className={cn(
-        'absolute inset-0 transition-transform duration-500 ease-out',
-        isActive ? 'opacity-100' : 'opacity-0',
+        'absolute inset-0 transition-all duration-500 ease-out',
+        getTransformClass(),
+        !isActive && 'pointer-events-none',
         className
       )}
-      style={{
-        transform: shouldRender ? getTransform() : initialTransform
-      }}
     >
       {children}
     </div>
