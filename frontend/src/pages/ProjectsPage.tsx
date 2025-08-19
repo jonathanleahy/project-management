@@ -202,17 +202,20 @@ export default function ProjectsPage() {
   return (
     <LayoutWithSidebar>
       {/* Main Content with sliding animation */}
-      <main className="relative overflow-hidden">
-        <div className="container mx-auto px-4 py-8">
+      <main className="relative overflow-hidden h-full">
+        <div className="container mx-auto px-4 py-8 h-full">
           {/* Sliding Container */}
           <div 
-            className="flex transition-transform duration-500 ease-out"
-            style={{
-              transform: showInlineCreate ? 'translateX(-100%)' : 'translateX(0)',
-            }}
+            className="relative w-full h-full"
           >
             {/* Projects List View */}
-            <div className="w-full flex-shrink-0">
+            <div 
+              className={`w-full transition-all duration-500 ease-out ${
+                showInlineCreate 
+                  ? 'transform -translate-x-full opacity-0 pointer-events-none absolute' 
+                  : 'transform translate-x-0 opacity-100'
+              }`}
+            >
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold">My Projects</h2>
                 <div className="flex gap-2">
@@ -281,10 +284,15 @@ export default function ProjectsPage() {
                 </Link>
               ))}
             </div>
-            </div>
 
             {/* Create Project Wizard View */}
-            <div className="w-full flex-shrink-0">
+            <div 
+              className={`w-full absolute top-0 left-0 transition-all duration-500 ease-out ${
+                showInlineCreate 
+                  ? 'transform translate-x-0 opacity-100' 
+                  : 'transform translate-x-full opacity-0 pointer-events-none'
+              }`}
+            >
               <ProjectCreationWizard 
                 onClose={handleCloseInline}
                 onCreate={handleCreateProjectInline}
