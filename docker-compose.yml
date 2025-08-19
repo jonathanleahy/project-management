@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: pm_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: project_management
+      MYSQL_USER: pmuser
+      MYSQL_PASSWORD: pmpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - pm_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: pm_backend
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: pmuser
+      DB_PASSWORD: pmpassword
+      DB_NAME: project_management
+      JWT_SECRET: your-secret-key-change-in-production
+      PORT: 8080
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - ./uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - pm_network
+
+  frontend:
+    image: node:18-alpine
+    container_name: pm_frontend
+    working_dir: /app
+    environment:
+      REACT_APP_API_URL: http://localhost:8080/graphql
+      REACT_APP_WS_URL: ws://localhost:8080/graphql
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - pm_network
+    command: sh -c "npm install && npm start"
+
+  adminer:
+    image: adminer
+    container_name: pm_adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - pm_network
+    depends_on:
+      - mysql
+
+networks:
+  pm_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

@@ -1,0 +1,348 @@
+scalar Time
+
+# User and Auth Types
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  createdAt: Time!
+  projects: [ProjectRole!]!
+}
+
+type AuthPayload {
+  user: User!
+  success: Boolean!
+}
+
+# Project Types
+type Project {
+  id: ID!
+  name: String!
+  description: String
+  owner: User!
+  createdAt: Time!
+  updatedAt: Time!
+  members: [ProjectRole!]!
+  tasks: [Task!]!
+  workflow: [WorkflowStatus!]!
+  shareCodes: [ShareCode!]!
+  stats: ProjectStats!
+}
+
+type ProjectRole {
+  id: ID!
+  project: Project!
+  user: User!
+  role: Role!
+  createdAt: Time!
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+type ProjectStats {
+  totalTasks: Int!
+  completedTasks: Int!
+  overdueTasks: Int!
+  totalMembers: Int!
+}
+
+# Workflow Types
+type WorkflowStatus {
+  id: ID!
+  projectId: ID!
+  name: String!
+  color: String!
+  position: Int!
+  isTerminal: Boolean!
+}
+
+# Task Types
+type Task {
+  id: ID!
+  project: Project!
+  parent: Task
+  title: String!
+  summary: String
+  status: WorkflowStatus!
+  assignee: User
+  priority: Priority!
+  dueDate: Time
+  progressPct: Int!
+  position: Int!
+  depth: Int!
+  createdAt: Time!
+  updatedAt: Time!
+  children: [Task!]!
+  dependencies: TaskDependencies!
+  documents: [Document!]!
+  canvases: [Canvas!]!
+  attachments: [Attachment!]!
+  documentCount: Int!
+  canvasCount: Int!
+  attachmentCount: Int!
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+type TaskDependencies {
+  blocks: [Task!]!
+  blockedBy: [Task!]!
+}
+
+# Document Types
+type Document {
+  id: ID!
+  taskId: ID!
+  name: String!
+  currentVersion: DocVersion!
+  versions: [DocVersion!]!
+  createdAt: Time!
+}
+
+type DocVersion {
+  id: ID!
+  documentId: ID!
+  version: Int!
+  markdown: String!
+  author: User!
+  createdAt: Time!
+  isActive: Boolean!
+}
+
+# Canvas Types
+type Canvas {
+  id: ID!
+  taskId: ID!
+  name: String!
+  thumbnail: String
+  dataJson: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+# Attachment Types
+type Attachment {
+  id: ID!
+  taskId: ID!
+  type: AttachmentType!
+  name: String!
+  url: String!
+  size: Int!
+  mimeType: String!
+  createdAt: Time!
+}
+
+enum AttachmentType {
+  IMAGE
+  FILE
+  VIDEO
+}
+
+# Comment Types
+type Comment {
+  id: ID!
+  taskId: ID!
+  user: User!
+  content: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+# Activity Types
+type Activity {
+  id: ID!
+  taskId: ID!
+  projectId: ID!
+  user: User!
+  action: String!
+  oldValue: String
+  newValue: String
+  metadata: String
+  createdAt: Time!
+}
+
+# Share Code Types
+type ShareCode {
+  id: ID!
+  projectId: ID!
+  code: String!
+  role: Role!
+  expiresAt: Time
+  maxUses: Int
+  uses: Int!
+  revoked: Boolean!
+  createdAt: Time!
+  createdBy: User!
+}
+
+# Filter and Pagination Types
+input TaskFilter {
+  status: ID
+  assigneeId: ID
+  priority: Priority
+  dueDateFrom: Time
+  dueDateTo: Time
+  search: String
+}
+
+input Pagination {
+  page: Int!
+  limit: Int!
+}
+
+type PageInfo {
+  total: Int!
+  page: Int!
+  pages: Int!
+  hasNext: Boolean!
+  hasPrev: Boolean!
+}
+
+type TaskPage {
+  tasks: [Task!]!
+  pageInfo: PageInfo!
+}
+
+# Root Query
+type Query {
+  # Auth
+  me: User
+
+  # Projects
+  listProjects: [Project!]!
+  getProject(id: ID!): Project
+
+  # Tasks
+  listTasks(
+    projectId: ID!
+    parentId: ID
+    filter: TaskFilter
+    pagination: Pagination
+  ): TaskPage!
+  getTask(id: ID!): Task
+  
+  # Documents and Canvases
+  getTaskDocuments(taskId: ID!): [Document!]!
+  getTaskCanvases(taskId: ID!): [Canvas!]!
+
+  # Documents
+  getDocument(id: ID!): Document
+  getDocVersions(documentId: ID!): [DocVersion!]!
+
+  # Canvas
+  getCanvas(id: ID!): Canvas
+  
+  # Comments and Activity
+  getTaskComments(taskId: ID!): [Comment!]!
+  getTaskActivity(taskId: ID!, limit: Int): [Activity!]!
+  getProjectActivity(projectId: ID!, limit: Int): [Activity!]!
+
+  # Share Codes
+  listShareCodes(projectId: ID!): [ShareCode!]!
+  validateShareCode(code: String!): ShareCode
+
+  # Workflow
+  getProjectWorkflow(projectId: ID!): [WorkflowStatus!]!
+}
+
+# Root Mutation
+type Mutation {
+  # Auth
+  register(email: String!, password: String!, name: String!): AuthPayload!
+  login(email: String!, password: String!): AuthPayload!
+  logout: Boolean!
+  resetPassword(email: String!): Boolean!
+  changePassword(oldPassword: String!, newPassword: String!): Boolean!
+
+  # Projects
+  createProject(name: String!, description: String): Project!
+  updateProject(id: ID!, name: String, description: String): Project!
+  deleteProject(id: ID!): Boolean!
+
+  # Project Members
+  addMember(projectId: ID!, userId: ID!, role: Role!): ProjectRole!
+  updateMemberRole(projectId: ID!, userId: ID!, role: Role!): ProjectRole!
+  removeMember(projectId: ID!, userId: ID!): Boolean!
+
+  # Workflow
+  setProjectWorkflow(projectId: ID!, statuses: [WorkflowStatusInput!]!): [WorkflowStatus!]!
+
+  # Tasks
+  createTask(input: CreateTaskInput!): Task!
+  updateTask(id: ID!, input: UpdateTaskInput!): Task!
+  deleteTask(id: ID!): Boolean!
+  reorderTask(id: ID!, position: Int!): Task!
+  setTaskStatus(id: ID!, statusId: ID!): Task!
+  setTaskAssignee(id: ID!, assigneeId: ID): Task!
+  setTaskProgress(id: ID!, progressPct: Int!): Task!
+  setTaskDueDate(id: ID!, dueDate: Time): Task!
+
+  # Dependencies
+  setDependencies(taskId: ID!, blocks: [ID!]!): Task!
+
+  # Documents
+  createDocument(taskId: ID!, name: String!, markdown: String!): Document!
+  updateDocument(id: ID!, name: String!): Document!
+  addDocVersion(documentId: ID!, markdown: String!): DocVersion!
+  restoreDocVersion(versionId: ID!): DocVersion!
+  deleteDocument(id: ID!): Boolean!
+
+  # Canvas
+  createCanvas(taskId: ID!, name: String!, dataJson: String!): Canvas!
+  updateCanvas(id: ID!, name: String, dataJson: String, thumbnail: String): Canvas!
+  deleteCanvas(id: ID!): Boolean!
+
+  # Attachments
+  createAttachment(taskId: ID!, type: AttachmentType!, name: String!, url: String!, size: Int!, mimeType: String!): Attachment!
+  deleteAttachment(id: ID!): Boolean!
+  
+  # Comments
+  createComment(taskId: ID!, content: String!): Comment!
+  updateComment(id: ID!, content: String!): Comment!
+  deleteComment(id: ID!): Boolean!
+
+  # Share Codes
+  createShareCode(projectId: ID!, role: Role!, expiresAt: Time, maxUses: Int): ShareCode!
+  redeemShareCode(code: String!): ProjectRole!
+  revokeShareCode(id: ID!): Boolean!
+}
+
+# Input Types
+input WorkflowStatusInput {
+  name: String!
+  color: String!
+  position: Int!
+  isTerminal: Boolean!
+}
+
+input CreateTaskInput {
+  projectId: ID!
+  parentId: ID
+  title: String!
+  summary: String
+  statusId: ID
+  assigneeId: ID
+  priority: Priority!
+  dueDate: Time
+  progressPct: Int
+}
+
+input UpdateTaskInput {
+  title: String
+  summary: String
+  statusId: ID
+  assigneeId: ID
+  priority: Priority
+  dueDate: Time
+  progressPct: Int
+}
