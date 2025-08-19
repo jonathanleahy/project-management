@@ -284,13 +284,15 @@ export default function ProjectsPage() {
             </div>
           </main>
 
-          {/* Create Project Wizard View */}
+          {/* Create Project Wizard View - Only render content when active */}
           <div className="w-1/2 h-full overflow-auto">
-            <ProjectCreationWizard 
-              onClose={handleCloseInline}
-              onCreate={handleCreateProjectInline}
-              isCreating={isCreating}
-            />
+            {showInlineCreate && (
+              <ProjectCreationWizard 
+                onClose={handleCloseInline}
+                onCreate={handleCreateProjectInline}
+                isCreating={isCreating}
+              />
+            )}
           </div>
         </div>
       </div>
