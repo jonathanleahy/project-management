@@ -53,11 +53,13 @@
   * {
     @apply border-border;
   }
-  html {
-    overflow-x: hidden;
-  }
-  body {
+  html, body {
     @apply bg-background text-foreground;
-    overflow-x: hidden;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  #root {
+    height: 100%;
   }
 }

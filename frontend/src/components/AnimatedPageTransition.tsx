@@ -14,44 +14,45 @@ export function AnimatedPageTransition({
   direction = 'right',
   className 
 }: AnimatedPageTransitionProps) {
-  const [shouldRender, setShouldRender] = useState(isActive)
-  const [animationClass, setAnimationClass] = useState('')
+  const [shouldRender, setShouldRender] = useState(false)
 
   useEffect(() => {
     if (isActive) {
       setShouldRender(true)
-      // Small delay to trigger animation
-      setTimeout(() => {
-        setAnimationClass('translate-x-0 opacity-100')
-      }, 10)
     } else {
-      // When hiding, slide out in opposite direction
-      const hideClass = direction === 'left' 
-        ? '-translate-x-full opacity-0'  // Slide out to left
-        : 'translate-x-full opacity-0'   // Slide out to right
-      setAnimationClass(hideClass)
       // Wait for animation to complete before unmounting
       const timer = setTimeout(() => {
         setShouldRender(false)
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [isActive, direction])
+  }, [isActive])
 
   if (!shouldRender) return null
 
-  // Initial position: left items start from left, right items start from right
-  const initialClass = direction === 'left' 
-    ? '-translate-x-full opacity-0'  // Start from left
-    : 'translate-x-full opacity-0'   // Start from right
+  // Determine the transform based on active state and direction
+  const getTransform = () => {
+    if (isActive) {
+      return 'translateX(0%)'  // Slide to center
+    } else {
+      // Slide out based on direction
+      return direction === 'left' ? 'translateX(-100%)' : 'translateX(100%)'
+    }
+  }
+
+  // Initial position based on direction
+  const initialTransform = direction === 'left' ? 'translateX(-100%)' : 'translateX(100%)'
 
   return (
     <div 
       className={cn(
-        'absolute inset-0 transition-all duration-500 ease-out',
-        animationClass || initialClass,
+        'absolute inset-0 transition-transform duration-500 ease-out',
+        isActive ? 'opacity-100' : 'opacity-0',
         className
       )}
+      style={{
+        transform: shouldRender ? getTransform() : initialTransform
+      }}
     >
       {children}
     </div>
